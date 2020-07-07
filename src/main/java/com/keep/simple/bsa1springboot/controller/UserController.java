@@ -2,25 +2,26 @@ package com.keep.simple.bsa1springboot.controller;
 
 import com.keep.simple.bsa1springboot.service.GiphService;
 import com.keep.simple.bsa1springboot.service.MainService;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
-import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat.URI;
-
 @RestController
-@Slf4j
-public class MainController {
+public class UserController {
 
     private final MainService mainService;
     private final GiphService giphService;
 
-    public MainController(MainService mainService, GiphService giphService) {
+    @Value("${api.header}")
+    private String header;
+
+    public UserController(MainService mainService, GiphService giphService) {
         this.mainService = mainService;
         this.giphService = giphService;
     }
@@ -70,13 +71,18 @@ public class MainController {
                 .body(result.get().toUri().toString());
     }
 
-    private boolean validate(String value) {
+    private static boolean validate(String value) {
         try {
             Paths.get(value);
             return true;
         } catch (InvalidPathException e) {
             return false;
         }
+    }
+
+    @ExceptionHandler(ServletRequestBindingException.class)
+    public ResponseEntity<String> handleHeaderError(){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Header Missing");
     }
 
 }

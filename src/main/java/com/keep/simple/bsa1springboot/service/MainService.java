@@ -1,9 +1,7 @@
 package com.keep.simple.bsa1springboot.service;
 
-import com.keep.simple.bsa1springboot.controller.InMemoryCacheService;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -27,7 +25,7 @@ public class MainService {
         Optional<Path> result = Optional.empty();
 
         if (!force) {
-            result = cacheService.getGiphByQuery(query);
+            result = cacheService.getOneByQuery(query);
         }
 
         if (result.isEmpty()) {

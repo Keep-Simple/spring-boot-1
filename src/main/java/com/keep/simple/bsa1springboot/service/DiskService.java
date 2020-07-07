@@ -50,7 +50,7 @@ public class DiskService {
 
         FileWriter out = new FileWriter(String.format(location, username) + "\\history.csv", true);
         try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT)) {
-                printer.printRecord(LocalDate.now(), query, savePath);
+                printer.printRecord(LocalDate.now(), query, savePath.toUri());
         }
     }
 

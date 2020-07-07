@@ -1,5 +1,6 @@
 package com.keep.simple.bsa1springboot.service;
 
+import com.keep.simple.bsa1springboot.dto.CacheDTO;
 import com.keep.simple.bsa1springboot.dto.GiphResponseDto;
 import kong.unirest.Unirest;
 import lombok.SneakyThrows;
@@ -8,9 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -19,8 +21,11 @@ public class CacheService {
     @Value("${storage.cache.location}")
     private String location;
 
+    @Value("${storage.cache.location.global}")
+    private String startPath;
+
     @SneakyThrows
-    public Optional<Path> getGiphByQuery(String query) {
+    public Optional<Path> getOneByQuery(String query) {
         Path path = Paths.get(String.format(location, query));
 
         if (!Files.exists(path)) {
@@ -29,6 +34,47 @@ public class CacheService {
 
         try (Stream<Path> paths = Files.walk(path)) {
             return paths.filter(Files::isRegularFile).findAny();
+        }
+    }
+
+    @SneakyThrows
+    public CacheDTO getAll() {
+        var result = new CacheDTO();
+
+        Path start = Paths.get(startPath);
+        Files.walkFileTree(start, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                if (dir.equals(start)) {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                result.addDir(dir);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                result.addGiph(file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return result;
+    }
+
+    @SneakyThrows
+    public CacheDTO getGiphsByQuery(String query) {
+        var result = new CacheDTO();
+
+        Path concreteStart = Paths.get(startPath + "\\" + query);
+        result.addDir(concreteStart);
+
+        try {
+            Files.walk(concreteStart)
+                    .filter(p -> !p.equals(concreteStart))
+                    .forEach(result::addGiph);
+        } finally {
+            return result;
         }
     }
 

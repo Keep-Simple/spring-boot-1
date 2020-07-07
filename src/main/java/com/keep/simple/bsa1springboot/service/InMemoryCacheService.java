@@ -1,4 +1,4 @@
-package com.keep.simple.bsa1springboot.controller;
+package com.keep.simple.bsa1springboot.service;
 
 import org.springframework.stereotype.Service;
 
@@ -39,4 +39,5 @@ public class InMemoryCacheService {
 
         return Optional.empty();
     }
+
 }
