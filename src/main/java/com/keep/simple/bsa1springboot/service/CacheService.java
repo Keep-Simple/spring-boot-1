@@ -38,7 +38,7 @@ public class CacheService {
         String gifDir = queryDir + giph.getId() + ".gif";
 
         if (Files.exists(Paths.get(gifDir))) {
-            return Optional.empty();
+            return Optional.of(Paths.get(gifDir));
         }
 
         Path path = Paths.get(queryDir);

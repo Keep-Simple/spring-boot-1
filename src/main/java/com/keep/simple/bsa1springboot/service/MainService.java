@@ -24,8 +24,11 @@ public class MainService {
     }
 
     public URI generateGif(String username, String query, boolean force) {
+        Optional<Path> result = Optional.empty();
 
-        var result = cacheService.getGiphByQuery(query);
+        if (!force) {
+            result = cacheService.getGiphByQuery(query);
+        }
 
         if (result.isEmpty()) {
             var response = giphService.requestGif(query);
