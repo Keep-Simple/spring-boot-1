@@ -4,9 +4,11 @@ target/
 !**/src/main/**
 !**/src/test/**
 
+*.properties
+**/bsa_giphy/**
+
 ### STS ###
 .apt_generated
-*.properties
 .classpath
 .factorypath
 .project
