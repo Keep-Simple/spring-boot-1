@@ -28,10 +28,15 @@ public class MainService {
         if (result.isEmpty()) {
             var response = giphService.requestGif(query);
 
-            result = cacheService.save(response.orElseThrow(), query);
+            if (response.isEmpty()) {
+                return URI.create("Nothing_found");
+            }
+
+            result = cacheService.save(response.get(), query);
         }
 
-        //        ramService.save(result.get(), username);
+        ramService.save(result.get(), username, query);
+
         return diskService.save(result.orElseThrow(), username, query).toUri();
     }
 }

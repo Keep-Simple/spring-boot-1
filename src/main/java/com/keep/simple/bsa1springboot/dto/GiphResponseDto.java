@@ -20,8 +20,11 @@ public class GiphResponseDto {
     @SuppressWarnings("unchecked")
     @JsonProperty("data")
     private void unpackNested(List<Map<String, Object>> data) {
-        this.id = (String)data.get(0).get("id");
-        Map<String,Map<String, Object>> gif = (Map<String, Map<String, Object>>) data.get(0).get("images");
-        this.url = (String)gif.get("downsized_large").get("url");
+        if (data.size() == 0) {
+            throw new IllegalArgumentException("No Results found");
+        }
+            this.id = (String) data.get(0).get("id");
+            Map<String, Map<String, Object>> gif = (Map<String, Map<String, Object>>) data.get(0).get("images");
+            this.url = (String) gif.get("downsized_large").get("url");
     }
 }

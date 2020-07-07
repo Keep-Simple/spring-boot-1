@@ -30,8 +30,8 @@ public class GiphService {
             GiphResponseDto giph = mapper.readValue(response.body(), GiphResponseDto.class);
 
             return Optional.of(giph);
-        } catch (IOException | InterruptedException ex) {
-            ex.printStackTrace();
+
+        } catch (IOException | InterruptedException| IllegalArgumentException ex) {
             return Optional.empty();
         }
     }
