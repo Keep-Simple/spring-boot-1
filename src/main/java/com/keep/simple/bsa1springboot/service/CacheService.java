@@ -97,4 +97,22 @@ public class CacheService {
 
         return Optional.of(result.toPath());
     }
+
+    @SneakyThrows
+    public void deleteAll() {
+        Path start = Paths.get(startPath);
+        Files.walkFileTree(start, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
 }

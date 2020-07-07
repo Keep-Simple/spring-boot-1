@@ -18,10 +18,6 @@ public class GiphService {
     @Value("${api.giphy.search}")
     private String url;
 
-    public String getAll() {
-        return null;
-    }
-
     public Optional<GiphResponseDto> requestGif(String query) {
         try {
             var response = HttpClient.newHttpClient().send(buildGetRequest(query), HttpResponse.BodyHandlers.ofString());
@@ -32,6 +28,7 @@ public class GiphService {
             return Optional.of(giph);
 
         } catch (IOException | InterruptedException| IllegalArgumentException ex) {
+            ex.printStackTrace();
             return Optional.empty();
         }
     }
