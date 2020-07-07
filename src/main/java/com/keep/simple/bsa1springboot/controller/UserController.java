@@ -1,7 +1,7 @@
 package com.keep.simple.bsa1springboot.controller;
 
 import com.keep.simple.bsa1springboot.service.DiskService;
-import com.keep.simple.bsa1springboot.service.GiphService;
+import com.keep.simple.bsa1springboot.service.InMemoryCacheService;
 import com.keep.simple.bsa1springboot.service.MainService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -10,24 +10,26 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 @RestController
+@RequestMapping("/user/")
 public class UserController {
 
     private final MainService mainService;
     private final DiskService diskService;
+    private final InMemoryCacheService ramService;
 
     @Value("${api.header}")
     private String header;
 
-    public UserController(MainService mainService, DiskService diskService) {
+    public UserController(MainService mainService, DiskService diskService, InMemoryCacheService ramService) {
         this.mainService = mainService;
         this.diskService = diskService;
+        this.ramService = ramService;
     }
 
-    @PostMapping("/user/{username}/generate")
+    @PostMapping("{username}/generate")
     public ResponseEntity<String> generateOrGetGif(
             @PathVariable String username,
             @RequestParam String query,
@@ -50,7 +52,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/user/{username}/search")
+    @GetMapping("{username}/search")
     public ResponseEntity<String> getGif(
             @PathVariable String username,
             @RequestParam String query,
@@ -72,7 +74,7 @@ public class UserController {
                 .body(result.get().toUri().toString());
     }
 
-    @GetMapping("/user/{username}/all")
+    @GetMapping("{username}/all")
     public ResponseEntity getUserData(@PathVariable String username) {
 
         if (!validate(username)) {
@@ -86,6 +88,44 @@ public class UserController {
         }
 
         return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("{username}/history")
+    public ResponseEntity getUserHistory(@PathVariable String username) {
+
+        if (!validate(username)) {
+            return ResponseEntity.badRequest().body("Invalid username/query");
+        }
+
+        var result = diskService.readLog(username);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    @DeleteMapping("{username}/history/clean")
+    public void deleteUserHistory(@PathVariable String username) {
+        diskService.clearLog(username);
+    }
+
+    @DeleteMapping("{username}/reset")
+    public void deleteUserCache(
+            @PathVariable String username,
+            @RequestParam(required = false) String query) {
+
+        if(query == null) {
+            ramService.clearUser(username);
+        } else {
+            ramService.clearUserQuery(username, query);
+        }
+    }
+
+    @DeleteMapping("{username}/clean")
+    public void deleteUser(@PathVariable String username) {
+        mainService.deleteUser(username);
     }
 
     private static boolean validate(String value) {

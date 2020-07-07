@@ -2,13 +2,17 @@ package com.keep.simple.bsa1springboot.service;
 
 import com.keep.simple.bsa1springboot.dto.DirsDTO;
 import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
+import com.keep.simple.bsa1springboot.dto.UserHistoryDTO;
 import com.keep.simple.bsa1springboot.helpers.DataHelper;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.*;
@@ -45,15 +49,6 @@ public class DiskService {
 
         return Files.copy(giphPath, savePath,
                 StandardCopyOption.REPLACE_EXISTING).toAbsolutePath();
-    }
-
-    @SneakyThrows
-    public void writeLogToFile(String username, Path savePath, String query) {
-
-        FileWriter out = new FileWriter(String.format(location, username) + "\\history.csv", true);
-        try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT)) {
-                printer.printRecord(LocalDate.now(), query, savePath.toUri());
-        }
     }
 
     @SneakyThrows
@@ -102,6 +97,63 @@ public class DiskService {
         }
 
         return getDirsResponseDTOS(result, start);
+    }
+
+    @SneakyThrows
+    public void clearUser(String username) {
+        String str = String.format(location, username);
+        Path deletePath = Paths.get(str);
+
+        if (Files.exists(deletePath)) {
+            deleteDirectory(deletePath.toFile());
+        }
+    }
+
+    public static boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
+    }
+
+    /**
+     * History.cvs
+     */
+
+    @SneakyThrows
+    public void writeLogToFile(String username, Path savePath, String query) {
+
+        FileWriter out = new FileWriter(String.format(location, username) + "\\history.csv", true);
+        try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT)) {
+            printer.printRecord(
+                    LocalDate.now(),
+                    query,
+                    savePath.toAbsolutePath().toUri());
+        }
+    }
+
+    @SneakyThrows
+    public ArrayList<UserHistoryDTO> readLog(String username) {
+        var result = new ArrayList<UserHistoryDTO>();
+        var in = new FileReader(String.format(location, username) + "\\history.csv");
+
+        Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
+        for (CSVRecord record : records) {
+            result.add(new UserHistoryDTO(
+                    record.get(0),
+                    record.get(1),
+                    record.get(2)
+            ));
+        }
+        return result;
+    }
+
+    @SneakyThrows
+    public void clearLog(String username) {
+        Files.delete(Paths.get(String.format(location, username) + "\\history.csv"));
     }
 
 }

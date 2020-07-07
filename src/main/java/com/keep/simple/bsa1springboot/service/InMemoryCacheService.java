@@ -40,4 +40,13 @@ public class InMemoryCacheService {
         return Optional.empty();
     }
 
+    public void clearUser(String username) {
+        cache.remove(username);
+    }
+
+    public void clearUserQuery(String username, String query) {
+        if (cache.containsKey(username)) {
+            cache.get(username).remove(query);
+        }
+    }
 }

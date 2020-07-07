@@ -84,4 +84,9 @@ public class MainService {
 
         return set;
     }
+
+    public void deleteUser(String username) {
+        ramService.clearUser(username);
+        diskService.clearUser(username);
+    }
 }
