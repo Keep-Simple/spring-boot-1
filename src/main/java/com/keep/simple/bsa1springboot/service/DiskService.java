@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 
 @Service
@@ -50,5 +52,21 @@ public class DiskService {
         try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT)) {
                 printer.printRecord(LocalDate.now(), query, savePath);
         }
+    }
+
+    @SneakyThrows
+    public Optional<Path> getGiph(String query, String name) {
+        String str = String.format(location, name) + query;
+
+        Path searchPath = Paths.get(str);
+
+        if (!Files.exists(searchPath)) {
+            return Optional.empty();
+        }
+
+        try (Stream<Path> paths = Files.walk(searchPath)) {
+            return paths.filter(Files::isRegularFile).findAny();
+        }
+
     }
 }

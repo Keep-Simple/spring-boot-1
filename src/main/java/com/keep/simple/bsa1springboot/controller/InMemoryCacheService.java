@@ -11,7 +11,9 @@ public class InMemoryCacheService {
     private final HashMap<String, HashMap<String, Set<Path>>> cache = new HashMap<>();
 
     public void save(Path source, String username, String query) {
-        if (cache.get(username) == null) {
+        source = source.toAbsolutePath();
+
+        if (!cache.containsKey(username)) {
             var map = new HashMap<String, Set<Path>>();
             var ar = new HashSet<Path>();
 
@@ -20,7 +22,7 @@ public class InMemoryCacheService {
             cache.put(username, map);
         }
 
-        if (cache.get(username).get(query) == null) {
+        if (!cache.get(username).containsKey(query)) {
             var ar = new HashSet<Path>();
 
             ar.add(source);
@@ -28,5 +30,13 @@ public class InMemoryCacheService {
         }
 
         cache.get(username).get(query).add(source);
+    }
+
+    public Optional<Path> getGiph(String query, String name) {
+        if (cache.containsKey(name) && cache.get(name).containsKey(query)) {
+            return cache.get(name).get(query).stream().findAny();
+        }
+
+        return Optional.empty();
     }
 }

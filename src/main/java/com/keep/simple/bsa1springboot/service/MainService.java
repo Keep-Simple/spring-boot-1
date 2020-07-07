@@ -4,6 +4,8 @@ import com.keep.simple.bsa1springboot.controller.InMemoryCacheService;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.nio.file.Path;
+import java.util.Optional;
 
 
 @Service
@@ -38,5 +40,25 @@ public class MainService {
         ramService.save(result.get(), username, query);
 
         return diskService.save(result.orElseThrow(), username, query).toUri();
+    }
+
+    public URI findGif(String username, String query, boolean force) {
+        Optional<Path> result;
+
+        if (!force) {
+            result = ramService.getGiph(query, username);
+
+            if (result.isPresent()) return result.get().toUri();
+        }
+
+        result = diskService.getGiph(query, username);
+
+        if (result.isEmpty()) {
+            return URI.create("Nothing_found");
+        }
+
+        result.ifPresent(path -> ramService.save(path, username, query));
+
+        return result.get().toUri();
     }
 }

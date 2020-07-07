@@ -28,7 +28,8 @@ public class MainController {
     public ResponseEntity<String> generateOrGetGif(
             @PathVariable String username,
             @RequestParam String query,
-            @RequestParam(defaultValue = "false") Boolean force) {
+            @RequestParam(defaultValue = "false") Boolean force
+    ) {
 
         if (!validate(username) || !validate(query)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username/query");
@@ -39,9 +40,21 @@ public class MainController {
                 .body(mainService.generateGif(username, query, force).toString());
     }
 
-    @GetMapping("/gifs")
-    public ResponseEntity<String> getAllGiphsFromDisk() {
-        return ResponseEntity.status(HttpStatus.OK).body(giphService.getAll());
+
+    @GetMapping("/user/{username}/search")
+    public ResponseEntity<String> getGif(
+            @PathVariable String username,
+            @RequestParam String query,
+            @RequestParam(defaultValue = "false") Boolean force
+    ) {
+
+        if (!validate(username) || !validate(query)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username/query");
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(mainService.findGif(username, query, force).toString());
     }
 
     private boolean validate(String value) {
