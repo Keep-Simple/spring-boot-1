@@ -1,6 +1,6 @@
 package com.keep.simple.bsa1springboot.service;
 
-import com.keep.simple.bsa1springboot.dto.CacheResponseDTO;
+import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -76,7 +76,7 @@ public class MainService {
         var cacheResult = cacheService
                 .getAll()
                 .stream()
-                .map(CacheResponseDTO::getGifs)
+                .map(DirsResponseDTO::getGifs)
                 .flatMap(List::stream)
                 .collect(Collectors.toSet());
 

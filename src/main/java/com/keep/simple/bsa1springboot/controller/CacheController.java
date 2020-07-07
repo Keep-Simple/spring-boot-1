@@ -1,14 +1,12 @@
 package com.keep.simple.bsa1springboot.controller;
 
-import com.keep.simple.bsa1springboot.dto.CacheDTO;
-import com.keep.simple.bsa1springboot.dto.CacheResponseDTO;
+import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 import com.keep.simple.bsa1springboot.service.CacheService;
 import com.keep.simple.bsa1springboot.service.GiphService;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -25,7 +23,7 @@ public class CacheController {
 
     @SneakyThrows
     @GetMapping("/cache")
-    public List<CacheResponseDTO> getCache(@RequestParam(required = false) String query) {
+    public List<DirsResponseDTO> getCache(@RequestParam(required = false) String query) {
 
         if (query != null) {
             return cacheService.getGiphsByQuery(query);
@@ -35,7 +33,7 @@ public class CacheController {
     }
 
     @PostMapping("/cache/generate")
-    public List<CacheResponseDTO> postToCache(@RequestParam String query) {
+    public List<DirsResponseDTO> postToCache(@RequestParam String query) {
 
         var response = giphService.requestGif(query);
 

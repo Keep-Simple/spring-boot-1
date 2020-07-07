@@ -1,9 +1,9 @@
 package com.keep.simple.bsa1springboot.service;
 
-import com.keep.simple.bsa1springboot.dto.CacheDTO;
-import com.keep.simple.bsa1springboot.dto.CacheResponseDTO;
+import com.keep.simple.bsa1springboot.dto.DirsDTO;
+import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 import com.keep.simple.bsa1springboot.dto.GiphResponseDto;
-import com.keep.simple.bsa1springboot.helpers.CacheMapper;
+import com.keep.simple.bsa1springboot.helpers.DataHelper;
 import kong.unirest.Unirest;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +16,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static com.keep.simple.bsa1springboot.helpers.DataHelper.getDirsResponseDTOS;
+
 
 @Service
 public class CacheService {
@@ -39,33 +42,16 @@ public class CacheService {
     }
 
     @SneakyThrows
-    public List<CacheResponseDTO> getAll() {
-        var result = new CacheDTO();
+    public List<DirsResponseDTO> getAll() {
+        var result = new DirsDTO();
 
         Path start = Paths.get(startPath);
-        Files.walkFileTree(start, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                if (dir.equals(start)) {
-                    return FileVisitResult.CONTINUE;
-                }
-
-                result.addDir(dir);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                result.addGiph(file);
-                return FileVisitResult.CONTINUE;
-            }
-        });
-        return CacheMapper.cacheDtoToResponse(result);
+        return getDirsResponseDTOS(result, start);
     }
 
     @SneakyThrows
-    public List<CacheResponseDTO> getGiphsByQuery(String query) {
-        var result = new CacheDTO();
+    public List<DirsResponseDTO> getGiphsByQuery(String query) {
+        var result = new DirsDTO();
 
         Path concreteStart = Paths.get(startPath + "\\" + query);
         result.addDir(concreteStart);
@@ -75,7 +61,7 @@ public class CacheService {
                     .filter(Files::isRegularFile)
                     .forEach(result::addGiph);
         } finally {
-            return CacheMapper.cacheDtoToResponse(result);
+            return DataHelper.cacheDtoToResponse(result);
         }
     }
 

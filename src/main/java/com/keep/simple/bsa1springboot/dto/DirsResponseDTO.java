@@ -14,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CacheResponseDTO {
+public class DirsResponseDTO {
     private String query;
     private ArrayList<Path> gifs = new ArrayList<>();
 }

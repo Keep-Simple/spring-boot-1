@@ -13,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CacheDTO {
+public class DirsDTO {
     private HashMap<String, Set<Path>> map = new HashMap<>();
 
     @SneakyThrows

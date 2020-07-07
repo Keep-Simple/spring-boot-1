@@ -1,6 +1,8 @@
 package com.keep.simple.bsa1springboot.service;
 
-import com.keep.simple.bsa1springboot.entities.Giph;
+import com.keep.simple.bsa1springboot.dto.DirsDTO;
+import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
+import com.keep.simple.bsa1springboot.helpers.DataHelper;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -12,10 +14,10 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static com.keep.simple.bsa1springboot.helpers.DataHelper.getDirsResponseDTOS;
 
 
 @Service
@@ -78,7 +80,7 @@ public class DiskService {
         Files.walkFileTree(root, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (!file.getFileName().endsWith(".csv")) {
+                if (!file.getFileName().toString().endsWith(".csv")) {
                     result.add(file);
                 }
                 return FileVisitResult.CONTINUE;
@@ -87,4 +89,19 @@ public class DiskService {
 
         return result;
     }
+
+    @SneakyThrows
+    public List<DirsResponseDTO> getAllForUser(String name) {
+        String str = String.format(location, name);
+        var result = new DirsDTO();
+
+        Path start = Paths.get(str);
+
+        if (!Files.exists(start)) {
+            return new ArrayList<>();
+        }
+
+        return getDirsResponseDTOS(result, start);
+    }
+
 }
