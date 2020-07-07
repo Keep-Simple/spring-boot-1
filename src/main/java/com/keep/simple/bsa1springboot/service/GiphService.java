@@ -21,13 +21,18 @@ public class GiphService {
     public Optional<GiphResponseDto> requestGif(String query) {
         try {
             var response = HttpClient.newHttpClient().send(buildGetRequest(query), HttpResponse.BodyHandlers.ofString());
+
+            // when no results
+            if (response.body().length() < 160) {
+                return Optional.empty();
+            }
             var mapper = new ObjectMapper();
 
             GiphResponseDto giph = mapper.readValue(response.body(), GiphResponseDto.class);
 
             return Optional.of(giph);
 
-        } catch (IOException | InterruptedException| IllegalArgumentException ex) {
+        } catch (IOException | InterruptedException | IllegalArgumentException ex) {
             ex.printStackTrace();
             return Optional.empty();
         }

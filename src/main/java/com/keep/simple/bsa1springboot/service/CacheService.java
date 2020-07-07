@@ -3,7 +3,7 @@ package com.keep.simple.bsa1springboot.service;
 import com.keep.simple.bsa1springboot.dto.DirsDTO;
 import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 import com.keep.simple.bsa1springboot.dto.GiphResponseDto;
-import com.keep.simple.bsa1springboot.helpers.DataHelper;
+import com.keep.simple.bsa1springboot.helpers.Helper;
 import kong.unirest.Unirest;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.keep.simple.bsa1springboot.helpers.DataHelper.getDirsResponseDTOS;
+import static com.keep.simple.bsa1springboot.helpers.Helper.getDirsResponseDTOS;
 
 
 @Service
@@ -56,13 +56,13 @@ public class CacheService {
         Path concreteStart = Paths.get(startPath + "\\" + query);
         result.addDir(concreteStart);
 
-        try {
+        if (Files.exists(concreteStart)) {
             Files.walk(concreteStart)
                     .filter(Files::isRegularFile)
                     .forEach(result::addGiph);
-        } finally {
-            return DataHelper.cacheDtoToResponse(result);
         }
+
+        return Helper.cacheDtoToResponse(result);
     }
 
     @SneakyThrows
@@ -92,7 +92,7 @@ public class CacheService {
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 if (!dir.equals(start))
-                Files.delete(dir);
+                    Files.delete(dir);
                 return FileVisitResult.CONTINUE;
             }
 

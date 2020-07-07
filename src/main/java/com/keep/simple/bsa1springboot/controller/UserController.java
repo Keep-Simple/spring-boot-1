@@ -1,16 +1,16 @@
 package com.keep.simple.bsa1springboot.controller;
 
+import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
+import com.keep.simple.bsa1springboot.dto.UserHistoryDTO;
 import com.keep.simple.bsa1springboot.service.DiskService;
 import com.keep.simple.bsa1springboot.service.InMemoryCacheService;
 import com.keep.simple.bsa1springboot.service.MainService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
+import java.util.List;
+
+import static com.keep.simple.bsa1springboot.helpers.Helper.validate;
 
 @RestController
 @RequestMapping("/user/")
@@ -25,6 +25,7 @@ public class UserController {
         this.diskService = diskService;
         this.ramService = ramService;
     }
+
 
     @PostMapping("{username}/generate")
     public ResponseEntity<String> generateOrGetGif(
@@ -43,11 +44,8 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity
-                .ok()
-                .body(result.get().toUri().toString());
+        return ResponseEntity.ok().body(result.get().toUri().toString());
     }
-
 
     @GetMapping("{username}/search")
     public ResponseEntity<String> getGif(
@@ -66,16 +64,14 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity
-                .ok()
-                .body(result.get().toUri().toString());
+        return ResponseEntity.ok().body(result.get().toUri().toString());
     }
 
     @GetMapping("{username}/all")
-    public ResponseEntity getUserData(@PathVariable String username) {
+    public ResponseEntity<List<DirsResponseDTO>> getUserData(@PathVariable String username) {
 
         if (!validate(username)) {
-            return ResponseEntity.badRequest().body("Invalid username/query");
+            return ResponseEntity.badRequest().build();
         }
 
         var result = diskService.getAllForUser(username);
@@ -88,10 +84,10 @@ public class UserController {
     }
 
     @GetMapping("{username}/history")
-    public ResponseEntity getUserHistory(@PathVariable String username) {
+    public ResponseEntity<List<UserHistoryDTO>> getUserHistory(@PathVariable String username) {
 
         if (!validate(username)) {
-            return ResponseEntity.badRequest().body("Invalid username/query");
+            return ResponseEntity.badRequest().build();
         }
 
         var result = diskService.readLog(username);
@@ -105,7 +101,9 @@ public class UserController {
 
     @DeleteMapping("{username}/history/clean")
     public void deleteUserHistory(@PathVariable String username) {
-        diskService.clearLog(username);
+        if (validate(username)) {
+            diskService.clearLog(username);
+        }
     }
 
     @DeleteMapping("{username}/reset")
@@ -113,30 +111,20 @@ public class UserController {
             @PathVariable String username,
             @RequestParam(required = false) String query) {
 
-        if(query == null) {
-            ramService.clearUser(username);
-        } else {
-            ramService.clearUserQuery(username, query);
+        if (validate(username)) {
+            if (query == null) {
+                ramService.clearUser(username);
+            } else {
+                ramService.clearUserQuery(username, query);
+            }
         }
     }
 
     @DeleteMapping("{username}/clean")
     public void deleteUser(@PathVariable String username) {
-        mainService.deleteUser(username);
-    }
-
-    private static boolean validate(String value) {
-        try {
-            Paths.get(value);
-            return true;
-        } catch (InvalidPathException e) {
-            return false;
+        if (validate(username)) {
+            mainService.deleteUser(username);
         }
-    }
-
-    @ExceptionHandler(ServletRequestBindingException.class)
-    public ResponseEntity<String> handleHeaderError(){
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Header Missing");
     }
 
 }

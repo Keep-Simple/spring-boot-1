@@ -4,10 +4,12 @@ import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 import com.keep.simple.bsa1springboot.service.CacheService;
 import com.keep.simple.bsa1springboot.service.GiphService;
 import lombok.SneakyThrows;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static com.keep.simple.bsa1springboot.helpers.Helper.validate;
 
 
 @RestController
@@ -23,27 +25,31 @@ public class CacheController {
 
     @SneakyThrows
     @GetMapping("/cache")
-    public List<DirsResponseDTO> getCache(@RequestParam(required = false) String query) {
+    public ResponseEntity<List<DirsResponseDTO>> getCache(@RequestParam(required = false) String query) {
 
-        if (query != null) {
-            return cacheService.getGiphsByQuery(query);
+        if (query != null && !validate(query)) {
+            return ResponseEntity.badRequest().build();
         }
 
-        return cacheService.getAll();
+        if (query != null) {
+            return ResponseEntity.ok().body(cacheService.getGiphsByQuery(query));
+        }
+
+        return ResponseEntity.ok().body(cacheService.getAll());
     }
 
     @PostMapping("/cache/generate")
-    public List<DirsResponseDTO> postToCache(@RequestParam String query) {
+    public ResponseEntity<List<DirsResponseDTO>> postToCache(@RequestParam String query) {
 
         var response = giphService.requestGif(query);
 
         if (response.isEmpty()) {
-            return new ArrayList<>();
+            return ResponseEntity.notFound().build();
         }
 
         cacheService.save(response.get(), query);
 
-        return cacheService.getGiphsByQuery(query);
+        return ResponseEntity.ok().body(cacheService.getGiphsByQuery(query));
     }
 
     @DeleteMapping("/cache")

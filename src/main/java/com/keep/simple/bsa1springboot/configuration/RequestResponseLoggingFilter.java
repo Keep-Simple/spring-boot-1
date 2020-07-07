@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+//
 @Component
 @Slf4j
 @Order(2)
@@ -27,7 +28,6 @@ public class RequestResponseLoggingFilter implements Filter {
         chain.doFilter(request, response);
         log.info("Logging Response :{}", res.getContentType());
 
-        chain.doFilter(req, res);
     }
 
 }

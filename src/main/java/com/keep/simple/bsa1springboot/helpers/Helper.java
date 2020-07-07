@@ -3,18 +3,16 @@ package com.keep.simple.bsa1springboot.helpers;
 import com.keep.simple.bsa1springboot.dto.DirsDTO;
 import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DataHelper {
+public class Helper {
 
     public static ArrayList<DirsResponseDTO> cacheDtoToResponse(DirsDTO dto) {
         var result = new ArrayList<DirsResponseDTO>();
@@ -53,6 +51,25 @@ public class DataHelper {
                 return FileVisitResult.CONTINUE;
             }
         });
-        return DataHelper.cacheDtoToResponse(result);
+        return Helper.cacheDtoToResponse(result);
+    }
+
+    public static boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
+    }
+
+    public static boolean validate(String value) {
+        try {
+            Paths.get(value);
+            return true;
+        } catch (InvalidPathException e) {
+            return false;
+        }
     }
 }

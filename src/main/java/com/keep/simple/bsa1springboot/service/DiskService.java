@@ -3,7 +3,6 @@ package com.keep.simple.bsa1springboot.service;
 import com.keep.simple.bsa1springboot.dto.DirsDTO;
 import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 import com.keep.simple.bsa1springboot.dto.UserHistoryDTO;
-import com.keep.simple.bsa1springboot.helpers.DataHelper;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -11,7 +10,6 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,7 +19,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.keep.simple.bsa1springboot.helpers.DataHelper.getDirsResponseDTOS;
+import static com.keep.simple.bsa1springboot.helpers.Helper.deleteDirectory;
+import static com.keep.simple.bsa1springboot.helpers.Helper.getDirsResponseDTOS;
 
 
 @Service
@@ -109,16 +108,6 @@ public class DiskService {
         }
     }
 
-    public static boolean deleteDirectory(File directoryToBeDeleted) {
-        File[] allContents = directoryToBeDeleted.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectory(file);
-            }
-        }
-        return directoryToBeDeleted.delete();
-    }
-
     /**
      * History.cvs
      */
@@ -138,7 +127,13 @@ public class DiskService {
     @SneakyThrows
     public ArrayList<UserHistoryDTO> readLog(String username) {
         var result = new ArrayList<UserHistoryDTO>();
-        var in = new FileReader(String.format(location, username) + "\\history.csv");
+        String str = String.format(location, username) + "\\history.csv";
+
+        if (!Files.exists(Paths.get(str))) {
+            return new ArrayList<>();
+        }
+
+        var in = new FileReader(str);
 
         Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
         for (CSVRecord record : records) {
@@ -153,7 +148,12 @@ public class DiskService {
 
     @SneakyThrows
     public void clearLog(String username) {
-        Files.delete(Paths.get(String.format(location, username) + "\\history.csv"));
+        String str = String.format(location, username) + "\\history.csv";
+        Path path = Paths.get(str);
+
+        if (Files.exists(path)) {
+            Files.delete(path);
+        }
     }
 
 }

@@ -3,7 +3,10 @@ package com.keep.simple.bsa1springboot.service;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class InMemoryCacheService {
@@ -49,4 +52,5 @@ public class InMemoryCacheService {
             cache.get(username).remove(query);
         }
     }
+
 }
