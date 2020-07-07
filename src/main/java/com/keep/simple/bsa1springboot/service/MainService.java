@@ -23,7 +23,7 @@ public class MainService {
         this.ramService = ramService;
     }
 
-    public URI generateGif(String username, String query, boolean force) {
+    public Optional<Path> generateGif(String username, String query, boolean force) {
         Optional<Path> result = Optional.empty();
 
         if (!force) {
@@ -34,7 +34,7 @@ public class MainService {
             var response = giphService.requestGif(query);
 
             if (response.isEmpty()) {
-                return URI.create("Nothing_found");
+                return Optional.empty();
             }
 
             result = cacheService.save(response.get(), query);
@@ -42,26 +42,26 @@ public class MainService {
 
         ramService.save(result.get(), username, query);
 
-        return diskService.save(result.orElseThrow(), username, query).toUri();
+        return Optional.of(diskService.save(result.orElseThrow(), username, query));
     }
 
-    public URI findGif(String username, String query, boolean force) {
+    public Optional<Path> findGif(String username, String query, boolean force) {
         Optional<Path> result;
 
         if (!force) {
             result = ramService.getGiph(query, username);
 
-            if (result.isPresent()) return result.get().toUri();
+            if (result.isPresent()) return result;
         }
 
         result = diskService.getGiph(query, username);
 
         if (result.isEmpty()) {
-            return URI.create("Nothing_found");
+            return Optional.empty();
         }
 
         result.ifPresent(path -> ramService.save(path, username, query));
 
-        return result.get().toUri();
+        return result;
     }
 }

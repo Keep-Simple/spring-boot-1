@@ -3,6 +3,7 @@ package com.keep.simple.bsa1springboot.controller;
 import com.keep.simple.bsa1springboot.service.GiphService;
 import com.keep.simple.bsa1springboot.service.MainService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,12 +33,18 @@ public class MainController {
     ) {
 
         if (!validate(username) || !validate(query)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username/query");
+            return ResponseEntity.badRequest().body("Invalid username/query");
+        }
+
+        var result = mainService.generateGif(username, query, force);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(mainService.generateGif(username, query, force).toString());
+                .ok()
+                .body(result.get().toUri().toString());
     }
 
 
@@ -49,12 +56,18 @@ public class MainController {
     ) {
 
         if (!validate(username) || !validate(query)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username/query");
+            return ResponseEntity.badRequest().body("Invalid username/query");
+        }
+
+        var result = mainService.findGif(username, query, force);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(mainService.findGif(username, query, force).toString());
+                .ok()
+                .body(result.get().toUri().toString());
     }
 
     private boolean validate(String value) {
