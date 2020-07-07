@@ -3,7 +3,11 @@ package com.keep.simple.bsa1springboot.service;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -61,5 +65,22 @@ public class MainService {
         result.ifPresent(path -> ramService.save(path, username, query));
 
         return result;
+    }
+
+    public Set<Path> findAllGifs() {
+        var set = new HashSet<Path>();
+
+        set.addAll(diskService.getAll());
+
+        var cacheResult = cacheService
+                .getAll()
+                .getMap()
+                .values()
+                .stream()
+                .flatMap(Set::stream).collect(Collectors.toSet());
+
+        set.addAll(cacheResult);
+
+        return set;
     }
 }

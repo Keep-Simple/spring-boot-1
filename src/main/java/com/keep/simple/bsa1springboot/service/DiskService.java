@@ -8,12 +8,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 
@@ -23,9 +24,8 @@ public class DiskService {
     @Value("${storage.main.location}")
     private String location;
 
-    public Giph generateGifForUser(String query, String username) {
-        return null;
-    }
+    @Value("${storage.main.location.global}")
+    private String startLocation;
 
     @SneakyThrows
     public Path save(Path giphPath, String username, String query) {
@@ -68,5 +68,23 @@ public class DiskService {
             return paths.filter(Files::isRegularFile).findAny();
         }
 
+    }
+
+    @SneakyThrows
+    public Set<Path> getAll() {
+        var result = new HashSet<Path>();
+        Path root = Paths.get(startLocation);
+
+        Files.walkFileTree(root, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (!file.getFileName().endsWith(".csv")) {
+                    result.add(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return result;
     }
 }

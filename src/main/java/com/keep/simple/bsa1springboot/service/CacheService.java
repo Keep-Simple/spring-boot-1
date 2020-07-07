@@ -11,8 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -71,7 +69,7 @@ public class CacheService {
 
         try {
             Files.walk(concreteStart)
-                    .filter(p -> !p.equals(concreteStart))
+                    .filter(Files::isRegularFile)
                     .forEach(result::addGiph);
         } finally {
             return result;
@@ -104,6 +102,7 @@ public class CacheService {
         Files.walkFileTree(start, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                if (!dir.equals(start))
                 Files.delete(dir);
                 return FileVisitResult.CONTINUE;
             }
