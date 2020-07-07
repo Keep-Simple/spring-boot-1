@@ -20,9 +20,6 @@ public class UserController {
     private final DiskService diskService;
     private final InMemoryCacheService ramService;
 
-    @Value("${api.header}")
-    private String header;
-
     public UserController(MainService mainService, DiskService diskService, InMemoryCacheService ramService) {
         this.mainService = mainService;
         this.diskService = diskService;
