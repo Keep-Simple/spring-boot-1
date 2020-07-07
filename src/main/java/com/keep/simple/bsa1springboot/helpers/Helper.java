@@ -51,7 +51,7 @@ public class Helper {
                 return FileVisitResult.CONTINUE;
             }
         });
-        return Helper.cacheDtoToResponse(result);
+        return cacheDtoToResponse(result);
     }
 
     public static boolean deleteDirectory(File directoryToBeDeleted) {

@@ -54,7 +54,9 @@ public class MainService {
         if (!force) {
             result = ramService.getGiph(query, username);
 
-            if (result.isPresent()) return result;
+            if (result.isPresent()) {
+                return result;
+            }
         }
 
         result = diskService.getGiph(query, username);
@@ -63,15 +65,13 @@ public class MainService {
             return Optional.empty();
         }
 
-        result.ifPresent(path -> ramService.save(path, username, query));
+        ramService.save(result.get(), username, query);
 
         return result;
     }
 
     public Set<Path> findAllGifs() {
-        var set = new HashSet<Path>();
-
-        set.addAll(diskService.getAll());
+        var set = new HashSet<>(diskService.getAll());
 
         var cacheResult = cacheService
                 .getAll()

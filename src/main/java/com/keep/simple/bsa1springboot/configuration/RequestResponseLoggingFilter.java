@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-//
 @Component
 @Slf4j
 @Order(2)
@@ -24,9 +23,9 @@ public class RequestResponseLoggingFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        log.info("Logging Request  {} : {}", req.getMethod(), req.getRequestURI());
+        log.info("REQUEST [{} {}]", req.getMethod(), req.getRequestURI());
         chain.doFilter(request, response);
-        log.info("Logging Response :{}", res.getContentType());
+        log.info("RESPONSE [{}]", res.getContentType());
 
     }
 

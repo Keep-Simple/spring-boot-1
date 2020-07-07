@@ -26,6 +26,7 @@ public class GiphService {
             if (response.body().length() < 160) {
                 return Optional.empty();
             }
+
             var mapper = new ObjectMapper();
 
             GiphResponseDto giph = mapper.readValue(response.body(), GiphResponseDto.class);
