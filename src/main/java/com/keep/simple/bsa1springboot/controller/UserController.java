@@ -71,6 +71,24 @@ public class UserController {
                 .body(result.get().toUri().toString());
     }
 
+//    @GetMapping("/user/{username}/all")
+//    public ResponseEntity<String> getGif(@PathVariable String username) {
+//
+//        if (!validate(username)) {
+//            return ResponseEntity.badRequest().body("Invalid username/query");
+//        }
+//
+//        var result = mainService.findGif(username, query, force);
+//
+//        if (result.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity
+//                .ok()
+//                .body(result.get().toUri().toString());
+//    }
+
     private static boolean validate(String value) {
         try {
             Paths.get(value);

@@ -1,7 +1,9 @@
 package com.keep.simple.bsa1springboot.service;
 
 import com.keep.simple.bsa1springboot.dto.CacheDTO;
+import com.keep.simple.bsa1springboot.dto.CacheResponseDTO;
 import com.keep.simple.bsa1springboot.dto.GiphResponseDto;
+import com.keep.simple.bsa1springboot.helpers.CacheMapper;
 import kong.unirest.Unirest;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -36,7 +39,7 @@ public class CacheService {
     }
 
     @SneakyThrows
-    public CacheDTO getAll() {
+    public List<CacheResponseDTO> getAll() {
         var result = new CacheDTO();
 
         Path start = Paths.get(startPath);
@@ -57,11 +60,11 @@ public class CacheService {
                 return FileVisitResult.CONTINUE;
             }
         });
-        return result;
+        return CacheMapper.cacheDtoToResponse(result);
     }
 
     @SneakyThrows
-    public CacheDTO getGiphsByQuery(String query) {
+    public List<CacheResponseDTO> getGiphsByQuery(String query) {
         var result = new CacheDTO();
 
         Path concreteStart = Paths.get(startPath + "\\" + query);
@@ -72,7 +75,7 @@ public class CacheService {
                     .filter(Files::isRegularFile)
                     .forEach(result::addGiph);
         } finally {
-            return result;
+            return CacheMapper.cacheDtoToResponse(result);
         }
     }
 
