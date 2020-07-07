@@ -3,7 +3,8 @@ package com.keep.simple.bsa1springboot.service;
 import com.keep.simple.bsa1springboot.controller.InMemoryCacheService;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.net.URI;
+
 
 @Service
 public class MainService {
@@ -20,20 +21,17 @@ public class MainService {
         this.ramService = ramService;
     }
 
-    public String generateGif(String username, String query) {
+    public URI generateGif(String username, String query, boolean force) {
 
         var result = cacheService.getGiphByQuery(query);
 
-//        if (result.isEmpty()) {
+        if (result.isEmpty()) {
             var response = giphService.requestGif(query);
-//
-//            result = Optional.of(cacheService.save(response));
-//        }
 
-//        diskService.save(result.get(), username);
-//        ramService.save(result.get(), username);
+            result = cacheService.save(response.orElseThrow(), query);
+        }
 
-    return null;}
-
-
+        //        ramService.save(result.get(), username);
+        return diskService.save(result.orElseThrow(), username, query).toUri();
+    }
 }

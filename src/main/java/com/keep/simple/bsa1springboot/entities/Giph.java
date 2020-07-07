@@ -4,11 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.nio.file.Path;
-import java.util.UUID;
 
 @NoArgsConstructor
 @Data
 public class Giph {
-    private UUID id;
+    private String id;
     private Path path;
 }
