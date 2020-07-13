@@ -34,7 +34,6 @@ public class GiphService {
             return Optional.of(giph);
 
         } catch (IOException | InterruptedException | IllegalArgumentException ex) {
-            ex.printStackTrace();
             return Optional.empty();
         }
     }

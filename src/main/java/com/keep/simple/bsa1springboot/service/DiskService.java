@@ -73,7 +73,7 @@ public class DiskService {
 
         Files.walkFileTree(root, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 if (!file.getFileName().toString().endsWith(".csv")) {
                     result.add(file);
                 }
@@ -87,7 +87,6 @@ public class DiskService {
     @SneakyThrows
     public List<DirsResponseDTO> getAllForUser(String name) {
         String str = String.format(location, name);
-        var result = new DirsDTO();
 
         Path start = Paths.get(str);
 
@@ -95,7 +94,7 @@ public class DiskService {
             return new ArrayList<>();
         }
 
-        return getDirsResponseDTOS(result, start);
+        return getDirsResponseDTOS(start);
     }
 
     @SneakyThrows

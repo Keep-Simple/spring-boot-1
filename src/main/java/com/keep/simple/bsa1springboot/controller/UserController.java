@@ -4,7 +4,7 @@ import com.keep.simple.bsa1springboot.dto.DirsResponseDTO;
 import com.keep.simple.bsa1springboot.dto.UserHistoryDTO;
 import com.keep.simple.bsa1springboot.service.DiskService;
 import com.keep.simple.bsa1springboot.service.InMemoryCacheService;
-import com.keep.simple.bsa1springboot.service.MainService;
+import com.keep.simple.bsa1springboot.service.GiphRootService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +16,12 @@ import static com.keep.simple.bsa1springboot.helpers.Helper.validate;
 @RequestMapping("/user/")
 public class UserController {
 
-    private final MainService mainService;
+    private final GiphRootService giphRootService;
     private final DiskService diskService;
     private final InMemoryCacheService ramService;
 
-    public UserController(MainService mainService, DiskService diskService, InMemoryCacheService ramService) {
-        this.mainService = mainService;
+    public UserController(GiphRootService giphRootService, DiskService diskService, InMemoryCacheService ramService) {
+        this.giphRootService = giphRootService;
         this.diskService = diskService;
         this.ramService = ramService;
     }
@@ -38,7 +38,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Invalid username/query");
         }
 
-        var result = mainService.generateGif(username, query, force);
+        var result = giphRootService.generateGif(username, query, force);
 
         if (result.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -58,7 +58,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Invalid username/query");
         }
 
-        var result = mainService.findGif(username, query, force);
+        var result = giphRootService.findGif(username, query, force);
 
         if (result.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -123,7 +123,7 @@ public class UserController {
     @DeleteMapping("{username}/clean")
     public void deleteUser(@PathVariable String username) {
         if (validate(username)) {
-            mainService.deleteUser(username);
+            giphRootService.deleteUser(username);
         }
     }
 

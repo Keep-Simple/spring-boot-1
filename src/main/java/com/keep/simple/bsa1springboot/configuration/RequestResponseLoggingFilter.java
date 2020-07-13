@@ -25,8 +25,13 @@ public class RequestResponseLoggingFilter implements Filter {
 
         log.info("REQUEST [{} {}]", req.getMethod(), req.getRequestURI());
         chain.doFilter(request, response);
-        log.info("RESPONSE [{}]", res.getContentType());
 
+        if (res.getContentType() == null) {
+            log.info("RESPONSE [Error]");
+            return;
+        }
+
+        log.info("RESPONSE [{}]", res.getContentType());
     }
 
 }

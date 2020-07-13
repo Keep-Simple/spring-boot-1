@@ -22,7 +22,7 @@ public class TransactionFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
 
         if (request.getHeader(header) == null) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing Header");
         }
 
         chain.doFilter(req, res);

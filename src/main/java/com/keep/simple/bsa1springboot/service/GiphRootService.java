@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class MainService {
+public class GiphRootService {
 
     private final DiskService diskService;
     private final GiphService giphService;
     private final CacheService cacheService;
     private final InMemoryCacheService ramService;
 
-    public MainService(DiskService diskService, GiphService giphService, CacheService cacheService, InMemoryCacheService ramService) {
+    public GiphRootService(DiskService diskService, GiphService giphService, CacheService cacheService, InMemoryCacheService ramService) {
         this.diskService = diskService;
         this.giphService = giphService;
         this.cacheService = cacheService;

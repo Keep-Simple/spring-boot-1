@@ -5,6 +5,7 @@ import com.keep.simple.bsa1springboot.service.CacheService;
 import com.keep.simple.bsa1springboot.service.GiphService;
 import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +41,10 @@ public class CacheController {
 
     @PostMapping("/cache/generate")
     public ResponseEntity<List<DirsResponseDTO>> postToCache(@RequestParam String query) {
+
+        if (query != null && !validate(query)) {
+            return ResponseEntity.badRequest().build();
+        }
 
         var response = giphService.requestGif(query);
 

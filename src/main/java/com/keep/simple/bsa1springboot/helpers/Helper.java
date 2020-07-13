@@ -30,7 +30,9 @@ public class Helper {
         return result;
     }
 
-    public static List<DirsResponseDTO> getDirsResponseDTOS(DirsDTO result, Path start) throws IOException {
+    public static List<DirsResponseDTO> getDirsResponseDTOS(Path start) throws IOException {
+        var result = new DirsDTO();
+
         Files.walkFileTree(start, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {

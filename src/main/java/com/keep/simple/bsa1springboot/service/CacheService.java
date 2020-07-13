@@ -43,10 +43,8 @@ public class CacheService {
 
     @SneakyThrows
     public List<DirsResponseDTO> getAll() {
-        var result = new DirsDTO();
-
         Path start = Paths.get(startPath);
-        return getDirsResponseDTOS(result, start);
+        return getDirsResponseDTOS(start);
     }
 
     @SneakyThrows
